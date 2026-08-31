@@ -73,10 +73,10 @@ export class Router {
     }
 
     init() {
-        // Handle initial route on page load
+        // Handle initial route on page load - always start at login
         let path = window.location.pathname;
         if (path === '/' || path === '/index.html') {
-            path = isLoggedIn() ? '/home' : '/login'; // Default to home if logged in, else login
+            path = '/login';
             window.history.replaceState(null, '', path);
         }
         this.handleRoute(path);
