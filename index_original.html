@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar & Habit Tracker</title>
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <h1 class="logo" id="logo"><i class="fa-regular fa-calendar-check"></i> StudySync</h1>
+            <nav id="nav-menu" class="hidden">
+                <button class="btn-nav" data-view="home"><i class="fa-solid fa-house"></i> Home</button>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- HOME VIEW -->
+            <section id="view-home" class="view active">
+                <div class="welcome-text">
+                    <h2>Welcome back!</h2>
+                    <p>What would you like to focus on today?</p>
+                </div>
+                <div class="cards-container">
+                    <div class="card" data-view="notes">
+                        <div class="card-icon"><i class="fa-regular fa-note-sticky"></i></div>
+                        <h3>Notes / Other Work</h3>
+                        <p>Write down general notes, thoughts, and daily tasks.</p>
+                    </div>
+                    <div class="card" data-view="calendar">
+                        <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3>Study Calendar</h3>
+                        <p>Track your daily study habits and subjects over the month.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NOTES VIEW -->
+            <section id="view-notes" class="view hidden">
+                <div class="view-header">
+                    <h2>Notes & Tasks</h2>
+                    <p>Auto-saved locally.</p>
+                </div>
+                <textarea id="notes-textarea" placeholder="Start typing your notes here..."></textarea>
+            </section>
+
+            <!-- STUDY CALENDAR VIEW -->
+            <section id="view-calendar" class="view hidden">
+                <div class="view-header calendar-header">
+                    <div class="header-titles">
+                        <h2>Study Calendar</h2>
+                        <p>Track your daily progress</p>
+                    </div>
+                    <div class="calendar-controls">
+                        <button class="btn-icon" id="prev-month"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h3 id="current-month-display">July 2026</h3>
+                        <button class="btn-icon" id="next-month"><i class="fa-solid fa-chevron-right"></i></button>
+                        <button class="btn-primary" id="btn-add-subject"><i class="fa-solid fa-plus"></i> Add Subject</button>
+                    </div>
+                </div>
+                
+                <div class="tracker-container">
+                    <div class="tracker-scroll-x">
+                        <table class="habit-tracker" id="tracker-table">
+                            <thead>
+                                <tr id="tracker-header-row">
+                                    <!-- Populated by JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="tracker-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div id="subject-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Subject</h3>
+                <button class="btn-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="subject-input" placeholder="e.g. SQL, Gen AI, Python..." autocomplete="off">
+                <input type="hidden" id="edit-subject-index">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn-primary" id="modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

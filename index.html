@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar & Habit Tracker</title>
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('⚠️ WARNING: You opened this file directly (file:///). Web browsers block modules this way. Please run the local server (python dev_server.py) and open http://localhost:8080 to make the buttons work!');
+            document.body.innerHTML = '<h1 style="color:red; text-align:center; margin-top:50px;">Please open via http://localhost:8080 (Run python dev_server.py)</h1><p style="text-align:center;">Browsers block JavaScript modules when opening files directly.</p>';
+        }
+    </script>
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <h1 class="logo" id="logo"><i class="fa-regular fa-calendar-check"></i> StudySync</h1>
+            <nav id="nav-menu" style="display: flex; gap: 10px; align-items: center;">
+                <button class="btn-nav" id="btn-info" title="Study Analysis"><i class="fa-solid fa-chart-pie"></i> Study Analysis</button>
+                <button class="btn-nav" data-view="home"><i class="fa-solid fa-house"></i> Home</button>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- HOME VIEW -->
+            <section id="view-home" class="view active">
+                <div class="welcome-text" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h2>Welcome back, Future Cop! 👋</h2>
+                        <p>What would you like to focus on today?</p>
+                    </div>
+                    <button id="theme-toggle-btn" class="btn-icon" title="Toggle Light/Dark Mode" style="font-size: 1.5rem; background: var(--bg-surface); padding: 0.5rem; border-radius: 50%; border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer; transition: transform 0.2s;">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+                <div class="cards-container">
+                    <div class="card" data-view="notes">
+                        <div class="card-icon"><i class="fa-regular fa-note-sticky"></i></div>
+                        <h3>Notes / Other Work</h3>
+                        <p>Write down general notes, thoughts, and daily tasks.</p>
+                    </div>
+                    <div class="card" data-view="calendar">
+                        <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3>Study Calendar</h3>
+                        <p>Track your daily study habits and subjects over the month.</p>
+                    </div>
+                    <div class="card" data-view="pomodoro">
+                        <div class="card-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                        <h3>Focus Timer</h3>
+                        <p>Focus on your subjects using structured time intervals.</p>
+                    </div>
+                    <div class="card" data-view="tasks">
+                        <div class="card-icon"><i class="fa-solid fa-list-check"></i></div>
+                        <h3>Task Board</h3>
+                        <p>Manage assignments and deadlines with a Kanban board.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NOTES VIEW -->
+            <section id="view-notes" class="view hidden">
+                <div class="view-header calendar-header">
+                    <div class="header-titles">
+                        <h2>Notes & Tasks</h2>
+                        <p>Auto-saved locally.</p>
+                    </div>
+                    <div class="calendar-controls">
+                        <button class="btn-primary" id="btn-add-note"><i class="fa-solid fa-plus"></i> Add Note</button>
+                    </div>
+                </div>
+                <div id="notes-container" style="display: flex; flex-direction: column; gap: 2rem;">
+                    <!-- JS will populate notes here -->
+                </div>
+            </section>
+
+            <!-- STUDY CALENDAR VIEW -->
+            <section id="view-calendar" class="view hidden">
+                <div class="view-header calendar-header">
+                    <div class="header-titles">
+                        <h2>Study Calendar</h2>
+                        <p>Track your daily progress</p>
+                    </div>
+                    <div class="calendar-controls">
+                        <h3 id="current-month-display" style="margin-right: 15px;">July 2026</h3>
+                        <button class="btn-primary" id="btn-add-subject"><i class="fa-solid fa-plus"></i> Add Subject</button>
+                    </div>
+                </div>
+                
+                <div class="tracker-container">
+                    <div class="tracker-scroll-x">
+                        <table class="habit-tracker" id="tracker-table">
+                            <thead>
+                                <tr id="tracker-header-row">
+                                    <!-- Populated by JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="tracker-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </section>
+
+            <!-- POMODORO VIEW -->
+            <section id="view-pomodoro" class="view hidden">
+                <div class="view-header">
+                    <h2>Focus Timer</h2>
+                    <p>Select a subject and start your focus session.</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 600px; width: 100%; margin: 0 auto; background: var(--bg-surface); padding: 1rem; border-radius: var(--radius-md); box-shadow: 0 4px 12px var(--shadow-color);">
+                    <!-- Subject Selector -->
+                    <div style="width: 100%; margin-bottom: 0.75rem;">
+                        <label for="pomodoro-subject" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-weight: 500; text-align: center;">Select Subject to Track</label>
+                        <select id="pomodoro-subject" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-main); color: var(--text-primary); font-size: 1rem;">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Mode Selectors -->
+                    <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem;">
+                        <button id="btn-mode-focus" class="btn-primary" style="background: var(--accent-primary);">Focus (25m)</button>
+                        <button id="btn-mode-short" class="btn-secondary" style="background: transparent; color: var(--text-primary); border: 2px solid var(--border-color);">Short Break (5m)</button>
+                        <button id="btn-mode-long" class="btn-secondary" style="background: transparent; color: var(--text-primary); border: 2px solid var(--border-color);">Long Break (15m)</button>
+                    </div>
+
+                    <!-- Timer Display (Circular Ring) -->
+                    <div class="pomodoro-timer-container">
+                        <svg class="pomodoro-svg" viewBox="0 0 200 200">
+                            <!-- Background track -->
+                            <circle class="pomodoro-track" cx="100" cy="100" r="90"></circle>
+                            <!-- Progress ring -->
+                            <circle class="pomodoro-progress" id="pomodoro-progress-ring" cx="100" cy="100" r="90"></circle>
+                        </svg>
+                        <div class="pomodoro-time-text" id="pomodoro-time">25:00</div>
+                    </div>
+                    
+                    <!-- Management Controls -->
+                    <div class="pomodoro-manage-controls">
+                        <button id="btn-pomodoro-minus" class="btn-icon" title="Subtract 1 Minute"><i class="fa-solid fa-minus"></i></button>
+                        <span style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;">Adjust Time</span>
+                        <button id="btn-pomodoro-plus" class="btn-icon" title="Add 1 Minute"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+
+                    <!-- Controls -->
+                    <div style="display: flex; gap: 1rem;">
+                        <button id="btn-pomodoro-start" class="btn-primary" style="font-size: 1.1rem; padding: 0.5rem 2rem; border-radius: 50px;"><i class="fa-solid fa-play"></i> Start</button>
+                        <button id="btn-pomodoro-reset" class="btn-secondary" style="font-size: 1.1rem; padding: 0.5rem 2rem; border-radius: 50px;"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KANBAN / TASKS VIEW -->
+            <section id="view-tasks" class="view hidden">
+                <div class="view-header calendar-header">
+                    <div class="header-titles">
+                        <h2>Task Board</h2>
+                        <p>Drag and drop tasks to track your progress.</p>
+                    </div>
+                    <div class="calendar-controls">
+                        <button class="btn-primary" id="btn-add-task"><i class="fa-solid fa-plus"></i> Add Task</button>
+                    </div>
+                </div>
+                
+                <div class="kanban-board">
+                    <div class="kanban-column" id="col-todo">
+                        <div class="kanban-col-header">
+                            <h3>To Do</h3>
+                            <span class="task-count" id="count-todo">0</span>
+                        </div>
+                        <div class="kanban-dropzone" data-status="todo" id="drop-todo">
+                            <!-- Tasks populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-column" id="col-progress">
+                        <div class="kanban-col-header">
+                            <h3>In Progress</h3>
+                            <span class="task-count" id="count-progress">0</span>
+                        </div>
+                        <div class="kanban-dropzone" data-status="progress" id="drop-progress">
+                            <!-- Tasks populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-column" id="col-done">
+                        <div class="kanban-col-header">
+                            <h3>Done</h3>
+                            <span class="task-count" id="count-done">0</span>
+                        </div>
+                        <div class="kanban-dropzone" data-status="done" id="drop-done">
+                            <!-- Tasks populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Performance Popup / Study Analysis -->
+    <div class="modal hidden" id="performance-popup">
+        <div class="modal-content" style="max-width: 600px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-chart-pie" style="color: var(--accent-primary); font-size: 1.25rem;"></i>
+                    <h2 style="font-size: 1.25rem; margin: 0;">Study Analysis</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <button class="btn-nav" id="popup-go-home" title="Go to Home" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); border: 1px solid rgba(99, 102, 241, 0.3);">
+                        <i class="fa-solid fa-house"></i> Home
+                    </button>
+                    <button class="btn-close" id="popup-close" title="Close"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 1.25rem;">
+                
+                <!-- Quick Summary Stats -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+                    <div style="background: var(--bg-main); padding: 0.75rem 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Total Days</div>
+                        <span style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);" id="stat-total-days">0</span>
+                    </div>
+                    <div style="background: var(--bg-main); padding: 0.75rem 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--accent-success); margin-bottom: 0.25rem;">Studied</div>
+                        <span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-success);" id="stat-days-studied">0</span>
+                    </div>
+                    <div style="background: var(--bg-main); padding: 0.75rem 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--accent-danger); margin-bottom: 0.25rem;">Missed</div>
+                        <span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-danger);" id="stat-days-missed">0</span>
+                    </div>
+                </div>
+                
+                <!-- Overall Chart -->
+                <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <div style="position: relative; width: 120px; height: 120px; flex-shrink: 0;">
+                        <canvas id="overall-progress-chart"></canvas>
+                        <div id="chart-center-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.25rem; font-weight: 700;">0%</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem;">Overall Completion</div>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Monthly consistency across all registered subjects.</p>
+                    </div>
+                </div>
+                
+                <!-- All Subjects Breakdown List -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+                        <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0;">
+                            <i class="fa-solid fa-list-check" style="color: var(--accent-primary); margin-right: 6px;"></i>All Subjects Breakdown (<span id="subject-count-badge">0</span>)
+                        </h3>
+                    </div>
+                    <div id="subject-progress-list" style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+                </div>
+                
+            </div>
+            <!-- Modal Footer with Home and Close Buttons -->
+            <div class="modal-footer" style="padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.1);">
+                <button class="btn-secondary" id="popup-footer-home" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    <i class="fa-solid fa-house"></i> Home Page
+                </button>
+                <button class="btn-primary" id="popup-footer-close" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div id="subject-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Subject</h3>
+                <button class="btn-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="subject-input" placeholder="e.g. SQL, Gen AI, Python..." autocomplete="off">
+                <input type="hidden" id="edit-subject-index">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn-primary" id="modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Task</h3>
+                <button class="btn-close" id="task-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Task Description</label>
+                    <input type="text" id="task-input-text" placeholder="What do you need to do?" class="auth-input" autocomplete="off">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Subject (Optional)</label>
+                    <select id="task-input-subject" class="auth-input">
+                        <option value="">-- No Subject --</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Priority</label>
+                    <select id="task-input-priority" class="auth-input">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Deadline (Optional)</label>
+                    <input type="date" id="task-input-deadline" class="auth-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="task-modal-cancel">Cancel</button>
+                <button class="btn-primary" id="task-modal-save">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- App Scripts -->
+    <script type="module" src="/src/main.js?v=1787992689755"></script>
+</body>
+</html>

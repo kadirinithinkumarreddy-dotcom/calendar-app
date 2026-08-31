@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Calendar & Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <div class="logo-container" id="logo" style="cursor:pointer;">
+                <i class="fa-solid fa-calendar-check logo-icon"></i>
+                <h1 class="logo-text">StudySync</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary hidden" id="btn-home-top"><i class="fa-solid fa-house"></i> Home</button>
+                <button class="btn-primary hidden" id="btn-check-performance"><i class="fa-solid fa-chart-pie"></i> Check Performance</button>
+                <div class="user-profile">
+                    <button class="btn-secondary" id="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- HOME VIEW -->
+            <section id="view-home" class="view active">
+                <div class="welcome-header">
+                    <h2>Welcome back!</h2>
+                    <p>What would you like to focus on today?</p>
+                </div>
+                
+                <div class="card-grid">
+                    <div class="card" data-view="notes">
+                        <div class="card-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+                        <h3>Notes / Other Work</h3>
+                        <p>Jot down general notes, daily tasks, and unstructured thoughts.</p>
+                    </div>
+                    
+                    <div class="card" data-view="calendar">
+                        <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                        <h3>Study Calendar</h3>
+                        <p>Track your daily study habits across different subjects.</p>
+                    </div>
+                    
+                    <div class="card" id="card-admin-login">
+                        <div class="card-icon"><i class="fa-solid fa-user-shield"></i></div>
+                        <h3>Admin Block</h3>
+                        <p>Manage users, database roles, and application settings.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NOTES VIEW -->
+            <section id="view-notes" class="view hidden">
+                <div class="view-header">
+                    <h2>Notes & Tasks</h2>
+                    <p>Auto-saved to the cloud.</p>
+                </div>
+                <textarea id="notes-textarea" placeholder="Start typing your notes here..."></textarea>
+            </section>
+
+            <!-- CALENDAR VIEW -->
+            <section id="view-calendar" class="view hidden">
+                <div class="view-header calendar-header-top">
+                    <h2>Study Calendar</h2>
+                    <div class="month-controls">
+                        <button class="btn-icon" id="prev-month"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h3 id="current-month-display">Month Year</h3>
+                        <button class="btn-icon" id="next-month"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <button class="btn-primary" id="btn-add-subject"><i class="fa-solid fa-plus"></i> Add Subject</button>
+                </div>
+                
+                <div class="tracker-container">
+                    <div class="table-scroll-wrapper">
+                        <table class="tracker-table">
+                            <thead>
+                                <tr id="tracker-header-row">
+                                    <!-- Populated by JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="tracker-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ADMIN DASHBOARD VIEW -->
+            <section id="view-admin-dashboard" class="view hidden">
+                <div class="view-header">
+                    <h2>Admin Dashboard</h2>
+                    <p>Manage users and administrators.</p>
+                </div>
+                
+                <div class="admin-dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    
+                    <!-- Pending Users Panel -->
+                    <div class="admin-panel">
+                        <h3><i class="fa-solid fa-users"></i> Pending User Requests</h3>
+                        <div class="table-scroll-wrapper" style="margin-top: 1rem; max-height: 400px; overflow-y: auto;">
+                            <table class="tracker-table" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pending-users-list">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Manage Admins Panel -->
+                    <div class="admin-panel">
+                        <h3><i class="fa-solid fa-user-plus"></i> Add Administrator</h3>
+                        <div class="admin-form">
+                            <div class="form-group">
+                                <label>Admin Email</label>
+                                <input type="email" id="new-admin-email" class="auth-input" placeholder="admin@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="new-admin-password" class="auth-input" placeholder="••••••••">
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" id="new-admin-confirm" class="auth-input" placeholder="••••••••">
+                            </div>
+                            <button class="btn-primary" id="btn-create-admin" style="width: 100%;">Create Admin</button>
+                            <p id="admin-create-msg" style="margin-top: 1rem; font-size: 0.9rem;"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Performance Popup -->
+    <div class="popup-overlay hidden" id="performance-popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2>Performance Dashboard</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <select id="performance-filter" class="auth-input" style="padding: 0.25rem 0.5rem; width: auto; margin-bottom: 0;">
+                        <option value="current">Current Month</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <button class="btn-close" id="popup-close"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="popup-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Total Days</h4>
+                        <span class="stat-value" id="stat-total-days">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Days Studied</h4>
+                        <span class="stat-value success" id="stat-days-studied">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Days Missed</h4>
+                        <span class="stat-value danger" id="stat-days-missed">0</span>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <canvas id="overall-progress-chart"></canvas>
+                        <div class="chart-center-text" id="chart-center-text">0%</div>
+                    </div>
+                    <div class="subject-breakdown">
+                        <h3>Subject Breakdown</h3>
+                        <div id="subject-progress-list" class="progress-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div class="modal-overlay hidden" id="subject-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Add New Subject</h3>
+                <button class="btn-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="subject-input" placeholder="e.g. Java, Python, SQL" autocomplete="off">
+                <input type="hidden" id="edit-subject-index" value="-1">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn-primary" id="modal-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standard User Auth Overlay -->
+    <div class="popup-overlay hidden" id="auth-overlay">
+        <div class="modal-content auth-content" style="max-width: 400px; width: 90%;">
+            <div class="modal-header">
+                <h3 id="auth-title">Welcome to StudySync</h3>
+            </div>
+            <div class="modal-body">
+                <p id="auth-error" class="danger hidden" style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--accent-danger);"></p>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Email Address</label>
+                    <input type="email" id="auth-email" placeholder="you@example.com" class="auth-input">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" class="auth-input">
+                </div>
+                <button class="btn-primary" id="btn-auth-submit" style="width: 100%; justify-content: center;">Log In</button>
+                
+                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+                    <span id="auth-toggle-text">Don't have an account? </span>
+                    <a href="#" id="auth-toggle-link" style="color: var(--accent-primary); text-decoration: none;">Sign up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="popup-overlay hidden" id="admin-login-modal">
+        <div class="modal-content auth-content">
+            <div class="modal-header">
+                <h3>Admin Portal</h3>
+                <button class="btn-close" id="admin-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="admin-auth-error" class="danger hidden" style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--accent-danger);"></p>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Admin Email</label>
+                    <input type="email" id="admin-auth-email" placeholder="admin@example.com" class="auth-input">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Password</label>
+                    <input type="password" id="admin-auth-password" placeholder="••••••••" class="auth-input">
+                </div>
+                <button class="btn-primary" id="btn-admin-login" style="width: 100%; justify-content: center; background: var(--accent-danger);">Admin Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app5.js"></script>
+</body>
+</html>
